@@ -1,0 +1,7 @@
+.messageText {
+	width:95%!important;
+}
+.messageText:before {
+	margin-right:5px!important;
+	vertical-align:middle!important;
+}
