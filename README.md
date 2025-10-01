@@ -1,6 +1,6 @@
 # CPQRecordJob_lwc
 
-This is a lwc component to substitute CPQ Visualforce components for Contract layout in Salesforce.
+This is a Salesforce lwc component to substitute CPQ Visualforce pages in Contract Layout (ContractSave and AmendContract).
 
 ## How Do You Plan to Deploy Your Changes?
 
