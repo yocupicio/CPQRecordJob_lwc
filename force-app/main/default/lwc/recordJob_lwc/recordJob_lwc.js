@@ -3,6 +3,7 @@ import {LightningElement, api, track } from 'lwc';
 import getJobDetails from '@salesforce/apex/recordJobController.getJobDetails';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import myStyles from '@salesforce/resourceUrl/sbqq__sb';
+import { updateRecord } from 'lightning/uiRecordApi';
 export default class RecordJob_lwc extends LightningElement {  
     // recordId will be passed from the record page where this component is added
     @api recordId;
@@ -14,9 +15,8 @@ export default class RecordJob_lwc extends LightningElement {
     @track operation = ''; 
     @track status = ''; 
     @track richTextMessage ='';
-    originalURL = location.href;
-    hasChanged = false;
     intervalId;
+    originalStatusQueued = false;
     connectedCallback() {
         if (this.recordId === undefined || this.recordId === null || this.recordId === '') {
             this.linkRichText = richTextMessage;
@@ -53,8 +53,14 @@ export default class RecordJob_lwc extends LightningElement {
                     this.intervalId = null;
                 }
                 this.boolVisible2 = false;
+                if (this.originalStatusQueued === true){
+                    updateRecord({ fields: { Id: this.recordId } });
+                }
+                this.originalStatusQueued = false;
             }
-            else if (result !== null & result.jobStatus === 'Queued'){                      
+            else if (result !== null & result.jobStatus === 'Queued'){ 
+                this.originalStatusQueued = true;
+                console.log('====RecordJob_lwc originalStatusQueued======', this.originalStatusQueued);                     
                 this.boolVisible2 = true;
                 let operation_status=result.recordId.split('::');
                 this.operation = '';
