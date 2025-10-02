@@ -11,7 +11,7 @@ Connect Visual Sudio Code org browser to your Salesforce organization and deploy
 ## Configure Your Ligning Record page
 
 Create a Lightning Record Page for Contract and then go to Edit Page. Drag and drop the custom recordJob_lwc component above of the detail section.
-![Configure Your Ligning Record page](https://github.com/yocupicio/CPQRecordJob_lwc/images/image1.jpg?raw=true)
+![Configure Your Ligning Record page](https://github.com/yocupicio/CPQRecordJob_lwc/blob/main/images/image1.jpg?raw=true)
 
 ## Purposes
 Adding the RecordJob_lwc component to the page layout serves 3 purposes: 
@@ -20,5 +20,5 @@ Adding the RecordJob_lwc component to the page layout serves 3 purposes:
 - Provides any run-time exceptions/errors stemming from unsuccessful Amendment or Renewals
 - Refreshes the record when the amend/renewal job is completed
 
-![purposes](https://github.com/yocupicio/CPQRecordJob_lwc/images/image2.jpg?raw=true)
+![purposes](https://github.com/yocupicio/CPQRecordJob_lwc/blob/main/images/image2.jpg?raw=true)
 
