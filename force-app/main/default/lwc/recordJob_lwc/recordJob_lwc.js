@@ -4,7 +4,8 @@ import { getRecord } from 'lightning/uiRecordApi';
 import getJobDetails from '@salesforce/apex/recordJobController.getJobDetails';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import myStyles from '@salesforce/resourceUrl/sbqq__sb';
-import { updateRecord } from 'lightning/uiRecordApi';
+// import the refresh event
+import { RefreshEvent } from "lightning/refresh";
 export default class RecordJob_lwc extends LightningElement {  
     // recordId will be passed from the record page where this component is added
     @api recordId;
@@ -79,9 +80,8 @@ export default class RecordJob_lwc extends LightningElement {
             if (jobStatusText !== 'Queued'){
                 this.clearTheInterval();
                 this.boolVisible2 = false;
-                if (this.originalStatusQueued === true){
-                    updateRecord({ fields: { Id: this.recordId } });
-                }
+                // fire the RefreshEvent
+                this.dispatchEvent(new RefreshEvent());
                 this.originalStatusQueued =  false;
             }
             else if (result !== null && result.jobStatus === 'Queued'){ 
