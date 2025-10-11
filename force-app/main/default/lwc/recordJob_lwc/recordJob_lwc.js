@@ -1,6 +1,5 @@
 // Added api (for recordid and track for the record parameter)
 import {LightningElement, api, track, wire } from 'lwc';
-import { getRecord } from 'lightning/uiRecordApi';
 import getJobDetails from '@salesforce/apex/recordJobController.getJobDetails';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import myStyles from '@salesforce/resourceUrl/sbqq__sb';
@@ -18,18 +17,7 @@ export default class RecordJob_lwc extends LightningElement {
     @track status = ''; 
     @track richTextMessage ='';
     intervalId;
-    originalStatusQueued = false;
-    //wiredRecord will help to refresh the component when record is updated
-    FIELDS = ['Id'];
-    @wire(getRecord, { recordId: '$recordId', fields: '$FIELDS' })
-    wiredRecord({ error, data }) {
-        if (error) {
-            
-        } else if (data) { 
-           this.intervalId = setTimeout(this.delayFunction.bind(this), 3000);          
-           // Call here any method you want to refresh your component and do what you want
-        }
-    }
+    originalStatusInProgressQueued = false;
     connectedCallback() {
         if (this.recordId === undefined || this.recordId === null || this.recordId === '') {
             this.linkRichText = richTextMessage;
@@ -37,7 +25,7 @@ export default class RecordJob_lwc extends LightningElement {
         }
         else {
             console.log("====RecordJob_lwc connectedCallback:recordId=====", this.recordId);
-            //this.refreshData();
+            this.refreshData();
             console.log("====RecordJob_lwc myStyles");
             loadStyle(this, myStyles)
             .then(result => {
@@ -67,7 +55,7 @@ export default class RecordJob_lwc extends LightningElement {
             return;
         }
         this.clearTheInterval();
-        console.log('==== RecordJob_lwc delayFunction ====');
+        console.log('==== RecordJob_lwc originalStatusInProgressQueued:', this.originalStatusInProgressQueued, '======');
         this.refreshData();
     }    
     refreshData() {
@@ -77,16 +65,17 @@ export default class RecordJob_lwc extends LightningElement {
             this.linkRichText = result !== null? result.jobDetails.replace(/\\n/g, '<br/>') : '';
             this.boolVisible = (result !== null && result.jobDetails !== ''?!this.invertVisibilityExpression:this.invertVisibilityExpression);
             let jobStatusText = result !== null? result.jobStatus : '';
-            if (jobStatusText !== 'Queued'){
+            if (jobStatusText !== 'In Progress' && jobStatusText !== 'Queued'){
                 this.clearTheInterval();
                 this.boolVisible2 = false;
                 // fire the RefreshEvent
-                this.dispatchEvent(new RefreshEvent());
-                this.originalStatusQueued =  false;
+                if (this.originalStatusInProgressQueued){
+                    this.dispatchEvent(new RefreshEvent());
+                    this.originalStatusInProgressQueued =  false;
+                }
             }
-            else if (result !== null && result.jobStatus === 'Queued'){ 
-                this.originalStatusQueued = true;
-                console.log('====RecordJob_lwc originalStatusQueued======', this.originalStatusQueued);                     
+            else if (result !== null && (jobStatusText === 'In Progress' || jobStatusText === 'Queued')){ 
+                this.originalStatusInProgressQueued = true;                    
                 this.boolVisible2 = true;
                 let operation_status=result.recordId.split('::');
                 this.operation = '';
@@ -101,10 +90,10 @@ export default class RecordJob_lwc extends LightningElement {
                         this.operation = 'Creating...';  
                         break;                        
                 }
-                this.status = result.jobStatus;
+                this.status = jobStatusText;
                 this.linkId = '/' + this.recordId; 
-                this.intervalId = setTimeout(this.delayFunction.bind(this), 3000);
-            }   
+            }
+            this.intervalId = setTimeout(this.delayFunction.bind(this), 3000);   
         })
         .catch(error=>{
             // if error, catch it into the tracking variable
